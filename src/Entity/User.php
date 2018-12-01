@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+
 /**
  * @ORM\Table(name="user",schema="security")
  * @ORM\Entity(repositoryClass="App\Repository\UserRepository")
@@ -33,6 +34,17 @@ class User implements UserInterface
      * @ORM\Column(type="string")
      */
     private $password;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Address")
+     * @ORM\JoinColumn(name="address_id", referencedColumnName="id")
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", length=64)
+     */
+    private $bank_account_num;
 
     public function getId(): ?int
     {
@@ -105,5 +117,29 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function getBankAccountNum(): ?string
+    {
+        return $this->bank_account_num;
+    }
+
+    public function setBankAccountNum(string $bank_account_num): self
+    {
+        $this->bank_account_num = $bank_account_num;
+
+        return $this;
+    }
+
+    public function getAddress(): ?Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?Address $address): self
+    {
+        $this->address = $address;
+
+        return $this;
     }
 }

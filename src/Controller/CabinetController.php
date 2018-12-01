@@ -9,7 +9,9 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+
 
 class CabinetController extends AbstractController
 {
@@ -23,5 +25,14 @@ class CabinetController extends AbstractController
         return $this->render('cabinet.html.twig', [
             'user' => $user,
         ]);
+    }
+
+    /**
+     * @Route("/get-prize", name="get_prize", methods={"POST"}, options={"expose": true})
+     */
+    public function getPrize()
+    {
+        $user = $this->getUser();
+        return new JsonResponse(['ok']);
     }
 }
