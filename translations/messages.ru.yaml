@@ -1,0 +1,5 @@
+security:
+    username: имя пользователя
+    password: пароль
+    submit: войти
+    remember_me: запомнить меня
