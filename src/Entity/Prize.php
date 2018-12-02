@@ -55,6 +55,23 @@ class Prize
      */
     private $send_date;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $reject_flag;
+
+    public function getRejectFlag(): ?bool
+    {
+        return $this->reject_flag;
+    }
+
+    public function setRejectFlag(?bool $reject_flag): self
+    {
+        $this->reject_flag = $reject_flag;
+
+        return $this;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

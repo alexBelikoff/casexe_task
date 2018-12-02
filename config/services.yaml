@@ -26,3 +26,8 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    casexe_task.prize_service:
+        class: App\Services\PrizeService
+        public: true
+        arguments: ["@doctrine.orm.entity_manager", '@security.token_storage']

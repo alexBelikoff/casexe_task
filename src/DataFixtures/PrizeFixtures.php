@@ -21,9 +21,20 @@ class PrizeFixtures extends Fixture implements DependentFixtureInterface
         $prize->setLottery($this->getReference(LotteryFixtures::CURRENT_LOTTERY));
         $prize->setUser($this->getReference(UserFixtures::CURRENT_USER));
         $prize->setPrizeType($this->getReference(PrizeTypeFixtures::MONEY_PRIZE));
-        $prize->getPrizeSum(3000);
+        $prize->setPrizeSum(3000);
         $prize->setPrizeDate(new \DateTime());
         $manager->persist($prize);
+        $manager->flush();
+
+        $date = new \DateTime();
+
+        $prize2 = new Prize();
+        $prize2->setLottery($this->getReference(LotteryFixtures::CURRENT_LOTTERY));
+        $prize2->setUser($this->getReference(UserFixtures::CURRENT_USER));
+        $prize2->setPrizeType($this->getReference(PrizeTypeFixtures::MONEY_PRIZE));
+        $prize2->setPrizeSum(7000);
+        $prize2->setPrizeDate($date->sub(new \DateInterval('P3D')));
+        $manager->persist($prize2);
         $manager->flush();
     }
 

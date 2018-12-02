@@ -138,8 +138,23 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="panel panel-default">
-                        <button class="btn btn-space btn-secondary btn-lg btn-danger" id="get_prize_btn">Получить приз</button>
-                        {#{ dump(user) }#}
+                        <div class="panel-heading panel-heading-divider"><span class="panel-subtitle">
+                                <button class="btn btn-space btn-secondary btn-lg btn-danger" id="get_prize_btn">Получить приз</button></span>
+                        </div>
+
+                        <div class="panel-body" id="prize_section" style="display: none;">
+                            <h2>Поздравляем, Вы выиграли <span id="prize_section_title"></span>
+                                <strong id="prize_section_summ"></strong>
+                                <strong id="prize_section_gift"></strong>
+                            </h2>
+                            <button class="btn btn-space btn-secondary btn-lg btn-secondary" style="display: none;" id="enroll_loyalty_btn">Зачислить баллы</button>
+                            <button class="btn btn-space btn-secondary btn-lg btn-secondary" style="display: none;" id="convert_money_to_loyalty_prize_btn">Конвертировать в баллы</button>
+                            <button class="btn btn-space btn-secondary btn-lg btn-secondary" style="display: none;" id="sent_money_to_bank_btn">Перевести в банк</button>
+                            <button class="btn btn-space btn-secondary btn-lg btn-danger" id="reject_prize_btn">Отказаться</button>
+                            <input type="hidden" id="prize_id">
+
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -155,7 +170,47 @@
             let url = Routing.generate('get_prize');
             $.post( url, function( data ) {
                 console.log(data);
+                $('#get_prize_btn').hide();
+                $('#prize_section').show();
+                $('#prize_section_title').text(data.title);
+                $('#prize_section_summ').text(data.summ);
+                $('#prize_section_gift').text(data.gift);
+                $('#prize_id').val(data.id);
+
+                $('#reject_prize_btn').show();
+
+                if(data.type === 'loyalty'){
+                    $('#enroll_loyalty_btn').show();
+                }
+                if(data.type === 'money'){
+                    $('#sent_money_to_bank_btn, #convert_money_to_loyalty_prize_btn').show();
+                }
             });
+        });
+
+        $('#enroll_loyalty_btn').on('click',function () {
+            $('#get_prize_btn').show();
+            $('#prize_section').hide();
+        });
+
+        $('#reject_prize_btn').on('click',function () {
+            let id = $('#prize_id').val(), url = Routing.generate('reject_prize');
+            $.post( url,{id:id}, function( data) {
+                alert(data.message);
+                $('#get_prize_btn').show();
+                $('#prize_section').hide();
+            });
+
+        });
+
+        $('#sent_money_to_bank_btn').on('click',function () {
+            $('#get_prize_btn').show();
+            $('#prize_section').hide();
+        });
+
+        $('#convert_money_to_loyalty_prize_btn').on('click',function () {
+            $('#get_prize_btn').show();
+            $('#prize_section').hide();
         });
     });
     </script>

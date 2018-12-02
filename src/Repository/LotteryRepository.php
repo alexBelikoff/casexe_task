@@ -19,6 +19,16 @@ class LotteryRepository extends ServiceEntityRepository
         parent::__construct($registry, Lottery::class);
     }
 
+    public function findActive():?Lottery
+    {
+        return $this->createQueryBuilder('l')
+            ->andWhere('l.active = :val')
+            ->setParameter('val', TRUE)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
     // /**
     //  * @return Lottery[] Returns an array of Lottery objects
     //  */

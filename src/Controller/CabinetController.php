@@ -9,11 +9,13 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 
-class CabinetController extends AbstractController
+class CabinetController extends Controller
 {
     /**
      * @Route("/cabinet", name="cabinet")
@@ -32,7 +34,17 @@ class CabinetController extends AbstractController
      */
     public function getPrize()
     {
-        $user = $this->getUser();
-        return new JsonResponse(['ok']);
+        $prizeService = $this->get('casexe_task.prize_service');
+        return new JsonResponse($prizeService->getPrize());
+    }
+
+    /**
+     * @Route("/reject-prize", name="reject_prize", methods={"POST"}, options={"expose": true})
+     */
+    public function rejectPrize(Request $request)
+    {
+        $prizeService = $this->get('casexe_task.prize_service');
+        $prizeId = $request->request->get('id');
+        return new JsonResponse($prizeService->rejectPrize((int)$prizeId));
     }
 }
