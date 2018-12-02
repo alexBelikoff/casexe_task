@@ -46,6 +46,11 @@ class User implements UserInterface
      */
     private $bank_account_num;
 
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $loyalty_points;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -139,6 +144,18 @@ class User implements UserInterface
     public function setAddress(?Address $address): self
     {
         $this->address = $address;
+
+        return $this;
+    }
+
+    public function getLoyaltyPoints(): ?int
+    {
+        return $this->loyalty_points;
+    }
+
+    public function setLoyaltyPoints(?int $loyalty_points): self
+    {
+        $this->loyalty_points = $loyalty_points;
 
         return $this;
     }

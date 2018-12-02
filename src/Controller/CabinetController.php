@@ -47,4 +47,35 @@ class CabinetController extends Controller
         $prizeId = $request->request->get('id');
         return new JsonResponse($prizeService->rejectPrize((int)$prizeId));
     }
+
+
+    /**
+     * @Route("/convert-money-prize-to-loyalty", name="convert_money_prize_to_loyalty", methods={"POST"}, options={"expose": true})
+     */
+    public function convertMoneyToLoyalty(Request $request)
+    {
+        $prizeService = $this->get('casexe_task.prize_service');
+        $prizeId = $request->request->get('id');
+        return new JsonResponse($prizeService->convertMoneyToLoyalty((int)$prizeId));
+    }
+
+    /**
+     * @Route("/sent-gift-by-post", name="sent_gift_by_post", methods={"POST"}, options={"expose": true})
+     */
+    public function sentGiftByPost(Request $request)
+    {
+        $prizeService = $this->get('casexe_task.prize_service');
+        $prizeId = $request->request->get('id');
+        return new JsonResponse($prizeService->sentGiftByPost((int)$prizeId));
+    }
+
+    /**
+     * @Route("/sent-money-to-bank", name="sent_money_to_bank", methods={"POST"}, options={"expose": true})
+     */
+    public function sentMoneyToBank(Request $request)
+    {
+        $prizeService = $this->get('casexe_task.prize_service');
+        $prizeId = $request->request->get('id');
+        return new JsonResponse($prizeService->sentMoneyToBank((int)$prizeId));
+    }
 }

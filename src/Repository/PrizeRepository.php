@@ -32,11 +32,11 @@ WHERE lottery_id = :id AND user_id IS NOT NULL AND reject_flag IS NOT TRUE', $rs
         return $result['money_sum'] ?? 0;
     }
 
-    public function findAvailableGiftsByLottery(int $id):array
+    public function findAvailableGiftsByLottery(int $id): array
     {
         //TODO: оптимизировать запрос
         $rsm = new ResultSetMapping();
-        $rsm->addEntityResult(\App\Entity\PrizeItem::class,'pi');
+        $rsm->addEntityResult(\App\Entity\PrizeItem::class, 'pi');
         $rsm->addFieldResult('pi', 'id', 'id');
         $rsm->addFieldResult('pi', 'name', 'name');
         $rsm->addMetaResult('pi', 'lottery_id', 'lottery_id');
@@ -46,6 +46,33 @@ WHERE pi.lottery_id = :id AND pi.id  NOT IN (SELECT prize_item_id FROM prize WHE
 IS NOT NULL AND reject_flag IS NOT TRUE)', $rsm);
         $query->setParameter('id', $id);
         return $query->getResult();
+    }
+
+    /**
+     * @param int $userId
+     * @param int $lotteryId
+     * @return array
+     */
+    public function findNotSentMoneyPrizeByUserAndLottery(int $userId, int $lotteryId): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('id', 'id');
+        $rsm->addScalarResult('prize_sum', 'prize_sum');
+        $em = $this->getEntityManager();
+        $query = $em->createNativeQuery("SELECT p.id, p.prize_sum FROM prize p JOIN prize_type pr 
+ON pr.id = p.prize_type_id WHERE p.lottery_id = :id AND p.user_id = :user_id AND pr.name = 'money' 
+AND p.send_date IS  NULL AND p.reject_flag IS NOT TRUE", $rsm);
+        $query->setParameter('id', $lotteryId);
+        $query->setParameter('user_id', $userId);
+        return $query->getResult();
+    }
+
+    public function setSendDateForTransferedMoney(array $ids):bool
+    {
+        $connection = $this->getEntityManager()->getConnection();
+        $idsString = implode(",", $ids);
+        $statement = $connection->prepare("UPDATE prize SET send_date = now() WHERE id IN  (" . $idsString . ")");
+        return (boolean)$statement->execute();
     }
 
 }

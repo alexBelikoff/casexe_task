@@ -19,6 +19,7 @@ class LotteryFixtures extends Fixture
         $lottery->setStartDate($startDate->sub(new \DateInterval('P10D')));
         $lottery->setEndDate($endDate->add(new \DateInterval('P10D')));
         $lottery->setCashTotal(80000);
+        $lottery->setExchangeCoefficient(0.33);
         $manager->persist($lottery);
         $manager->flush();
         $this->addReference(self::CURRENT_LOTTERY, $lottery);

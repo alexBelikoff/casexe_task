@@ -42,13 +42,17 @@ class PrizeService
         $this->prizeTypeRep = $this->em->getRepository(PrizeType::class);
 
         $this->currentLottery = $this->em->getRepository(Lottery::class)->findActive();
+    }
+
+    private function init(): void
+    {
         $this->availableMoney = $this->checkAvailableMoney();
-        if($this->availableMoney > 0){
-            array_push($this->prizeTypeArray,'money');
+        if ($this->availableMoney > 0) {
+            array_push($this->prizeTypeArray, 'money');
         }
         $this->availableGifts = $this->checkAvailableGifts();
-        if(count($this->availableGifts) > 0){
-            array_push($this->prizeTypeArray,'gift');
+        if (count($this->availableGifts) > 0) {
+            array_push($this->prizeTypeArray, 'gift');
         }
     }
 
@@ -66,6 +70,7 @@ class PrizeService
 
     public function getPrize()
     {
+        $this->init();
         $prizeKey = array_rand($this->prizeTypeArray);
 
         $prize = new Prize();
@@ -74,11 +79,11 @@ class PrizeService
         $prize->setPrizeDate(new \DateTime());
 
         $prizeType = $this->prizeTypeRep->findOneBy(['name' => $this->prizeTypeArray[$prizeKey]]);
-        if($prizeType){
+        if ($prizeType) {
             $prize->setPrizeType($prizeType);
         }
 
-        switch ($this->prizeTypeArray[$prizeKey]){
+        switch ($this->prizeTypeArray[$prizeKey]) {
             case 'loyalty':
                 $min = $prizeType ? $prizeType->getRangeMin() : 0;
                 $max = $prizeType ? $prizeType->getRangeMax() : self::MAX_LOYALTY;
@@ -99,18 +104,18 @@ class PrizeService
         return $this->normalizePrize($prize);
     }
 
-    private function getRandomMoneyLoyalty(int $min, int $max):int
+    private function getRandomMoneyLoyalty(int $min, int $max): int
     {
         return random_int($min, $max);
     }
 
-    private function getRandomGifts():PrizeItem
+    private function getRandomGifts(): PrizeItem
     {
         $index = array_rand($this->availableGifts);
         return $this->availableGifts[$index];
     }
 
-    private function normalizePrize(Prize $prize):array
+    private function normalizePrize(Prize $prize): array
     {
         $normalizedPrize = [];
         $normalizedPrize['id'] = $prize->getId();
@@ -121,10 +126,10 @@ class PrizeService
         return $normalizedPrize;
     }
 
-    public function rejectPrize(int $id):array
+    public function rejectPrize(int $id): array
     {
         $prize = $this->prizeRep->find($id);
-        if(!$prize){
+        if (!$prize) {
             return ['message' => 'А тут и не от чего отказываться!'];
         }
         $prize->setRejectFlag(true);
@@ -133,5 +138,59 @@ class PrizeService
         return ['message' => 'Вы успешно отказались. Надеемся, что у Вас всё в порядке!'];
     }
 
+    public function convertMoneyToLoyalty(int $id): array
+    {
+        $prize = $this->prizeRep->find($id);
+        if (!$prize || $prize->getPrizeType()->getName() !== 'money') {
+            return ['message' => 'А тут нечего конвертировать'];
+        }
+        if ($prize->getConvertDate()) {
+            return ['message' => 'Уже сконвертированы ' . $prize->getConvertDate()->format('d-m-Y H:i')];
+        }
+        $coefficient = $this->currentLottery->getExchangeCoefficient() ? $this->currentLottery->getExchangeCoefficient() : 1;
+        $sum = (int)($prize->getPrizeSum() * $coefficient);
+        $this->user->setLoyaltyPoints($sum);
+        $this->em->persist($this->user);
+        $this->em->flush();
+        return ['message' => 'Вам зачисленно ' . $sum . ' баллов. Ваш балланс: ' . $this->user->getLoyaltyPoints()];
 
+    }
+
+    public function sentGiftByPost(int $id): array
+    {
+        $prize = $this->prizeRep->find($id);
+        if (!$prize || $prize->getPrizeType()->getName() !== 'gift') {
+            return ['message' => 'А тут нечего отсылать'];
+        }
+
+        if (!$this->user->getAddress()) {
+            return ['message' => 'Введите свой адрес в личном кабинете'];
+        }
+
+        $prize->setSendDate(new \DateTime());
+        $this->em->persist($prize);
+        $this->em->flush();
+        return ['message' => 'Подарок успешно отправлен. Не забывайте проверять почтовый ящик.'];
+    }
+
+    public function sentMoneyToBank(int $id): array
+    {
+        $prize = $this->prizeRep->find($id);
+        if (!$prize || $prize->getPrizeType()->getName() !== 'money' || $prize->getPrizeSum() <= 0) {
+            return ['message' => 'А тут нечего перечислять'];
+        }
+        if (!$this->user->getBankAccountNum()) {
+            return ['message' => 'Уточните свой банковский счет в личном кабинете'];
+        }
+        $prize->setSendDate(new \DateTime());
+
+        if (true) {
+            //Вызываем API банка, перечисляем туда деньги, если все ок
+            $this->em->persist($prize);
+            $this->em->flush();
+            return ['message' => 'На Ваш банковский счет перечисленно ' . $prize->getPrizeSum()];
+        } else {
+            return ['message' => 'Проблемы с доступом к Вашему счету, попробуйте позже'];
+        }
+    }
 }

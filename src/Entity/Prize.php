@@ -56,6 +56,11 @@ class Prize
     private $send_date;
 
     /**
+     * @ORM\Column(type="datetime",nullable=true)
+     */
+    private $convert_date;
+
+    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $reject_flag;
@@ -157,6 +162,18 @@ class Prize
     public function setPrizeItem(?PrizeItem $prizeItem): self
     {
         $this->prizeItem = $prizeItem;
+
+        return $this;
+    }
+
+    public function getConvertDate(): ?\DateTimeInterface
+    {
+        return $this->convert_date;
+    }
+
+    public function setConvertDate(?\DateTimeInterface $convert_date): self
+    {
+        $this->convert_date = $convert_date;
 
         return $this;
     }

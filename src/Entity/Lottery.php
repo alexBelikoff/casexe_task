@@ -36,6 +36,11 @@ class Lottery
      */
     private $cash_total;
 
+    /**
+     * @ORM\Column(type="float", precision=10, scale=5, nullable=true)
+     */
+    private $exchange_coefficient;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -85,6 +90,18 @@ class Lottery
     public function setCashTotal(?int $cash_total): self
     {
         $this->cash_total = $cash_total;
+
+        return $this;
+    }
+
+    public function getExchangeCoefficient()
+    {
+        return $this->exchange_coefficient;
+    }
+
+    public function setExchangeCoefficient($exchange_coefficient): self
+    {
+        $this->exchange_coefficient = $exchange_coefficient;
 
         return $this;
     }
