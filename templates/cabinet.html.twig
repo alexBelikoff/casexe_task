@@ -182,11 +182,14 @@
 
                 if(data.type === 'loyalty'){
                     $('#enroll_loyalty_btn').show();
+                    $('#sent_money_to_bank_btn,#convert_money_to_loyalty_prize_btn,#sent_gift_by_post_btn').hide();
                 }
                 if(data.type === 'money'){
                     $('#sent_money_to_bank_btn, #convert_money_to_loyalty_prize_btn').show();
+                    $('#enroll_loyalty_btn, #sent_gift_by_post_btn').hide();
                 }
                 if(data.type === 'gift'){
+                    $('#sent_money_to_bank_btn, #convert_money_to_loyalty_prize_btn, #enroll_loyalty_btn').hide();
                     $('#sent_gift_by_post_btn').show();
                 }
             });

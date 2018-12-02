@@ -90,7 +90,7 @@ class PrizeService
                 $prize->setPrizeSum($this->getRandomMoneyLoyalty($min, $max));
                 break;
             case 'money':
-                $min = $prizeType ? $prizeType->getRangeMin() : 0;
+                $min = $prizeType ? ($prizeType->getRangeMin() > $this->availableMoney ? ($this->availableMoney - 1) : $prizeType->getRangeMin()) : 0;
                 $max = $prizeType ? ($prizeType->getRangeMax() > $this->availableMoney ? $this->availableMoney : $prizeType->getRangeMax()) : $this->availableMoney;
                 $prize->setPrizeSum($this->getRandomMoneyLoyalty($min, $max));
                 break;
@@ -149,7 +149,8 @@ class PrizeService
         }
         $coefficient = $this->currentLottery->getExchangeCoefficient() ? $this->currentLottery->getExchangeCoefficient() : 1;
         $sum = (int)($prize->getPrizeSum() * $coefficient);
-        $this->user->setLoyaltyPoints($sum);
+        $totalSum = $sum + $this->user->getLoyaltyPoints();
+        $this->user->setLoyaltyPoints($totalSum);
         $this->em->persist($this->user);
         $this->em->flush();
         return ['message' => 'Вам зачисленно ' . $sum . ' баллов. Ваш балланс: ' . $this->user->getLoyaltyPoints()];
