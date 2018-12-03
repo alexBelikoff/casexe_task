@@ -30,3 +30,4 @@
     6. Установить assets php bin/console assets:install --symlink
     7. Запустить сервер php bin/console server:run
     8. Открыть в браузере http://127.0.0.1:8000/
+    9. Пример консольной команды: php bin/console app:send-money 1 3 (где, 1 - айди пользователя, 3 - количество штук в пачке
